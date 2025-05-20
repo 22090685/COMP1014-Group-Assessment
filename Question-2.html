@@ -360,7 +360,7 @@ display: none;
 <pre class="r"><code>SleepCogStudy &lt;- read.csv(&quot;Resources/Sleep_Cognition_Study_f1PhaXA.csv&quot;)</code></pre>
 <div id="test-whether-gender-is-independent-of-nap-frequency." class="section level3">
 <h3>Test whether gender is independent of nap frequency.</h3>
-<pre class="r"><code># Inital Table
+<pre class="r"><code># Initial Table
 table(SleepCogStudy$Gender, SleepCogStudy$NapFrequency)</code></pre>
 <pre><code>##             
 ##              Never Often Rarely Sometimes
@@ -397,7 +397,7 @@ chisq.test(genderTable, simulate.p.value = TRUE)</code></pre>
 ##  replicates)
 ## 
 ## data:  genderTable
-## X-squared = 7.7081, df = NA, p-value = 0.5677</code></pre>
+## X-squared = 7.7081, df = NA, p-value = 0.5672</code></pre>
 <pre class="r"><code># p-value = 0.5662 
 
 # Conclusion:
