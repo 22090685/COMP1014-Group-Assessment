@@ -16,7 +16,7 @@ SleepCogStudy <- read.csv("Resources/Sleep_Cognition_Study_f1PhaXA.csv")
 ### Test whether gender is independent of nap frequency.
 
 ```{r}
-# Inital Table
+# Initial Table
 table(SleepCogStudy$Gender, SleepCogStudy$NapFrequency)
 genderTable = matrix(c(43,41,33,38,28,27,28,47,1,1,2,4,2,1,2,2), ncol = 4)
 
