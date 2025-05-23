@@ -116,3 +116,191 @@ Which of your results surprised you and why? What would you test if you had more
 
 Only create a question and explain the solution method in words.
 
+
+
+---
+title: "COMP1014 / MATH7016 Assignment Autumn 2025"
+author: "Ricky Melo, and Dylan Costa"
+date: "Due 20-05-2025"
+output: html_document
+---
+
+{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+
+####### Load csv File
+
+{r}
+SleepCogStudy <- read.csv("Resources/Sleep_Cognition_Study_f1PhaXA.csv")
+
+
+
+### ASSIGNMENT CASE
+### -----------------------
+### Australian Neuroplasticity and Learning Efficiency Study
+Sleep quality and cognitive function play a vital role in overall well-being and
+productivity. This study examines these factors in adults aged 20-35 across
+Australia, including individuals from various occupational backgrounds and
+lifestyles. It explores how sleep patterns, lifestyle habits, and daily routines
+influence learning efficiency and cognitive adaptability.
+
+### Data Collection Process
+The study used stratified random sampling to capture participants from
+diverse occupations and lifestyles. Recruitment was conducted through
+university mailing lists, workplace wellness programs, and social media,
+resulting in a final sample of 300 individuals selected after screening.
+
+### Data Sources:
+• Wearable device tracking: All participants used wrist-based trackers to
+measure sleep duration, sleep consistency, and physical activity levels.
+• Self-reported surveys: Participants completed structured questionnaires on
+diet, caffeine intake, screen time, stress, and social interactions.
+• Cognitive performance tests: Standardised assessments measured memory,
+reaction time, and logical reasoning over three months.
+
+
+
+## Question 2
+### Test whether gender is independent of nap frequency.
+### Visualisation of relevant Data
+
+{r}
+# Data entered manually
+table(SleepCogStudy$Gender, SleepCogStudy$NapFrequency)
+
+# Create contingency table from dataset directly
+genderTable <- table(SleepCogStudy$Gender, SleepCogStudy$NapFrequency)
+
+
+barplot(genderTable, col = c("pink", "skyblue", "yellow", "brown"), beside = TRUE, legend = rownames(genderTable),
+        main = "Nap Frequency by Gender",
+        xlab = "Nap Frequency",
+        ylab = "Total number of naps")
+
+
+
+#### Inital Observations:
+It can be observed from the bar plot that the number of naps taken does not significantly vary by gender. It is additionally observed that across all gender options, naps are taken either 'Never' or 'Often' a majority of the time. This may suggest that the number of participants vary across the gender options, and may not accurately reflect the frequency of naps taken.  
+
+### Analysis - Test independence of gender on nap frequency
+### Hypothesis:
+#### H0: Gender is independent of nap frequency
+#### HA: Gender is dependent of nap frequency
+
+{r}
+# Expected Values
+# Simulate expected Counts and test statistic
+chisq.test(genderTable, simulate.p.value = TRUE)
+# p-value = 0.5662 
+# X^2 Value = 7.7081
+
+
+
+
+####  Interpretation of results 
+##### The null hypothesis is not rejected as the p-value of the model (0.5662) is greater than the significance level of 0.05, - indicative that there is no statistically significant relation between gender and nap frequencies. The initial observation was confirmed to be correct, and the x^2 value of 7.7081 supports this conclusion, as no major deiviation occurs from the expected values under independence.
+
+
+#### Errors:
+##### No major errors encountered during the creation of the test, however minor errors were created through repeated output verification.
+ 
+### Ai Usage:
+##### Ai (ChatGPT) was utilised in the formatting of the file, and providing input on how to present my report following best practices. ChatGPT had suggested I create a contingency table that drew the required values directly from the data in place of utilising a matrix - the inital idea that I had implemented. I found that that the reasoning of using direct values from the data; whilst impacted the barplot minimally, made more efficient use of Rstudio, and improved legibility of the code overall.
+
+
+
+## Question 3
+Test whether participants who use melatonin supplements have significantly longer average sleep durations than those who don’t.
+
+## Question 4
+Test whether average sleep duration vary significantly across different genders.
+
+
+## Question 5.
+### Test if screen time before bed can be used to predict average sleep duration among office workers.
+### Visualisation of relevant Data
+
+```{r}
+# Filter data to office workers
+office_data <- subset(SleepCogStudy, OccupationType == "Office Worker")
+
+# Plot the filtered data
+plot(office_data$ScreenTimeBeforeBed, office_data$AverageSleepDuration,
+     main = "Sleep Duration vs. Screen Time (Office Workers)",
+     xlab = "Screen Time before bed (minutes)",
+     ylab = "Average Sleep Duration (hours)",
+     pch = 19, col = "black")
+```
+
+
+#### Initial Observations:
+#####  It can be observed that the scatter plot suggests a negative linear trend between the increase of screen Time and the decrease of the average duration of sleep. As such, it is expected that the increase of screentime before bed reduces the average sleep duration. This leads to the observation that a linear regression model would be most suitable to conduct the test.
+
+### Analysis: Testing if Screentime predicts Sleep Duration
+#### Hypothesis:
+###### H0: Screentime does not predict sleep duration (βA = 0)
+###### HA: Screentime predict sleep duration (βA ≠ 0)
+
+```{r}
+# Fit linear regression model 
+fit <- lm(AverageSleepDuration ~ ScreenTimeBeforeBed, data = office_data)
+summary(fit)
+
+#plot Sleep Duration vs. Screen Time 
+plot(office_data$ScreenTimeBeforeBed, office_data$AverageSleepDuration,
+     main = "Sleep Duration vs. Screen Time (Office Workers)",
+     xlab = "Screen Time before bed (minutes)",
+     ylab = "Average Sleep Duration (hours)",
+     pch = 19, col = "black")
+abline(fit, col = "red", lwd = 2)
+
+# Coefficients
+coef(fit)
+
+# Confidence intervals
+confint(fit)
+
+# ANOVA table
+anova(fit)
+```
+
+####    Assess the strength of the predictive power of the model.
+
+```{r}
+summary(fit)$r.squared  # R-squared value
+summary(fit)$adj.r.squared  # Adjusted R-squared
+```
+
+
+
+##### The null hypothesis is rejected as the the p-value of the model (3.411e-05) is greater than the test statistic at a 5% significance level - indicative that screen time has strong statistical significance. The r^2 value of ~ 0.23 suggests that only around 23% of the variation in sleep duration can be explained by the number of screen time before bed. 
+
+####  Residuals: 
+##### It is observered that the residual points of data are spread randomly around 0. This suggests that the variability does not seem to be reliant on either the x or y axis
+
+```{r}
+# Residual plot
+plot(fit$residuals,
+     main = "Residuals of the Model",
+     ylab = "Residuals",
+     xlab = "Index",
+     pch = 19,
+     col = "blue")
+abline(h = 0, col = "red", lty = 2)
+
+```
+
+#### Errors:
+##### Error in xy.coords(x, y, xlabel, ylabel, log) : 'x' and 'y' lengths differ
+##### Error was caused by obtaining data values from the incorrect origin of 'SleepCogStudy', and not the subset 'office_data'. Once the origin was corrected, the scattterplot displayed the intended points of data.
+ 
+### Ai Usage:
+##### Ai (ChatGPT) was utilised in the formatting of the file, and providing input on how to present my report following best practices. Methods that were generated by chatGPT had been discarded due to oversimplifying my work to a level that I had difficulty understanding. One such case was the use of '% in % ' in place of my preference to filter the office.data into a vector.
+
+
+## Question 6 - Ricky
+The results of question 5 had showed that whilst the relationship between the average sleep duration and screen time before bed were statistically significant, the residuals of the relationship had indicated that the predictive capability is limited due to a large spread.
+A repeated test with more variables accounted for, such as external habits to be compared to would be ideal, as despite the common variable of being an office worker, the individuals may still partake in activities outside of the job which could have an impact on their sleep duration.
+
